@@ -1,3 +1,8 @@
 venv
 .gitignore
 *.log
+.docker-compose.yml
+.git
+.idea
+__pycache__
+.env

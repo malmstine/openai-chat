@@ -53,9 +53,10 @@ try:
         if message.from_user.id not in USER_WHITE_LIST:
             return
 
+        await bot.send_chat_action(message.from_user.id, 'typing')
         async with async_session() as session:
             answer = await answer_bot(session, message.from_user.id, message.text)
-            await bot.reply_to(message, answer)
+            await bot.send_message(message.chat.id, answer)
             return answer
 
 

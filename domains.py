@@ -10,17 +10,20 @@ from chat import send_messages
 async def init_new_chat(session, user_id):
     ex = await session.execute(chat_table.insert()
                                          .returning(chat_table.c.id))
-
     [chat_id] = ex.fetchone()
 
-    try:
+    ex = await session.execute(active_chat_table.select()
+                                                .where(active_chat_table.c.user_id == user_id))
+
+    if list(ex):
         await session.execute(active_chat_table.update()
                                                .values(active_chat=chat_id)
                                                .where(active_chat_table.c.user_id == user_id))
-    except sqlalchemy.exc.DatabaseError:
+    else:
         await session.execute(active_chat_table.insert()
                                                .values(user_id=user_id,
                                                        active_chat=chat_id))
+
     await session.commit()
     return chat_id
 

@@ -2,32 +2,27 @@ version: '3.8'
 
 services:
   web:
-    image: secret:latest
-    ports:
-      - "8000:8000"
-    environment:
-      - DB_USER=secret
-      - DB_PASS=secret
-      - DB_HOST=db
-      - DB_NAME=secret
+    image: malmstine/openai-chat:latest
+    env_file:
+      - .env
     depends_on:
       db:
          condition: service_healthy
     links:
       - db
   db:
-    image: postgres:15-alpine
+    image: postgres:latest
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
     volumes:
-      - postgres-volume:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=secret
-      - POSTGRES_PASSWORD=secret
-      - POSTGRES_DB=secret
+      - postgres-volume-openai:/var/lib/postgresql/data/
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U secret"]
+      test: ["CMD-SHELL", "pg_isready -U openai-chat"]
       interval: 5s
       timeout: 10s
       retries: 10
 
 volumes:
-  postgres-volume:
+  postgres-volume-openai:
