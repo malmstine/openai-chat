@@ -1,0 +1,8 @@
+asyncpg==0.27.0
+greenlet==2.0.2
+sqlalchemy==2.0.16
+psycopg2==2.9.6
+alembic==1.11.1
+pydantic==1.10.9
+pyTelegramBotAPI
+openai

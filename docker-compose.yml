@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    image: secret:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_USER=secret
+      - DB_PASS=secret
+      - DB_HOST=db
+      - DB_NAME=secret
+    depends_on:
+      db:
+         condition: service_healthy
+    links:
+      - db
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=secret
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=secret
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U secret"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  postgres-volume:
