@@ -1,14 +1,12 @@
-import asyncio
 import datetime
-
-import sqlalchemy
 
 from models import chat_table, active_chat_table, message_table
 from chat import send_messages
 
 
-async def init_new_chat(session, user_id):
+async def init_new_chat(session, user_id, system_role=None):
     ex = await session.execute(chat_table.insert()
+                                         .values(system_role=system_role)
                                          .returning(chat_table.c.id))
     [chat_id] = ex.fetchone()
 
@@ -38,13 +36,18 @@ async def add_message(session, content, role, chat_id):
 
 
 async def get_chat_messages(session, chat_id):
+    system_role = await session.execute(
+        chat_table.select().with_only_columns(chat_table.c.system_role)
+        .where(chat_table.c.id == chat_id)
+    )
+    system_role = system_role.scalar()
     ex = await session.execute(message_table.select()
                                             .with_only_columns(message_table.c.role, message_table.c.content)
                                             .where(message_table.c.chat_id == chat_id))
     res = []
     for role, content in ex.fetchall():
         res.append(dict(role=role, content=content))
-    return res
+    return res, system_role
 
 
 async def answer_bot(session, user_id, text):
@@ -57,7 +60,12 @@ async def answer_bot(session, user_id, text):
         chat_id = await init_new_chat(session, user_id)
 
     await add_message(session, text, "user", chat_id)
-    messages = await get_chat_messages(session, chat_id)
+    messages, system_role = await get_chat_messages(session, chat_id)
+    if system_role:
+        messages.insert(0, dict(
+            role="system",
+            content=system_role,
+        ))
     new_mess = send_messages(messages)
     await session.commit()
     return new_mess

@@ -44,7 +44,12 @@ try:
     async def new_chat(message):
         user_id = message.from_user.id
         async with async_session() as session:
-            await init_new_chat(session, user_id)
+            text = message.text
+            if "\n" not in text:
+                system_role = None
+            else:
+                _, system_role = text.split("\n", maxsplit=1)
+            await init_new_chat(session, user_id, system_role=system_role)
             await session.commit()
             await bot.send_message(message.chat.id, "✨")
 

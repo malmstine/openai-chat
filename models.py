@@ -10,7 +10,7 @@ chat_table = sqlalchemy.Table(
     "chat",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.BigInteger, primary_key=True),
-
+    sqlalchemy.Column("system_role", sqlalchemy.Text, default=sqlalchemy.Null),
 )
 
 
