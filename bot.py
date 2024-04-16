@@ -37,6 +37,17 @@ def create_session_marker(engine_):
 async_session = create_session_marker(engine)
 
 
+def admin_command(msg: str):
+    if msg.startswith("/users "):
+        action = msg.lstrip("/users ")
+        if action.startswith("add ") or action.startswith("rem "):
+            action = action[:3]
+            user = action[4:]
+            if user:
+                return True
+    return False
+
+
 try:
     bot = AsyncTeleBot(BOT_TOKEN)
 
@@ -53,7 +64,12 @@ try:
             await session.commit()
             await bot.send_message(message.chat.id, "✨")
 
-    @bot.message_handler(func=lambda msg: msg.text != "/new")
+
+    @bot.message_handler(func=admin_command)
+    async def new_chat(message):
+        pass
+
+    @bot.message_handler(func=lambda msg: msg.text != "/new" and not msg.text.startswith("/users"))
     async def send_welcome(message):
         if message.from_user.id not in USER_WHITE_LIST:
             return
