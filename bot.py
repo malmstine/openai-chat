@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from telebot.async_telebot import AsyncTeleBot
 from domains import init_new_chat, answer_bot
-
+from src.openai_chat.telebot import users_command
 
 logging.basicConfig(filename="fatum.log", format='%(asctime)s %(message)s', filemode='w')
 
@@ -37,17 +37,6 @@ def create_session_marker(engine_):
 async_session = create_session_marker(engine)
 
 
-def admin_command(msg: str):
-    if msg.startswith("/users "):
-        action = msg.lstrip("/users ")
-        if action.startswith("add ") or action.startswith("rem "):
-            action = action[:3]
-            user = action[4:]
-            if user:
-                return True
-    return False
-
-
 try:
     bot = AsyncTeleBot(BOT_TOKEN)
 
@@ -65,8 +54,10 @@ try:
             await bot.send_message(message.chat.id, "✨")
 
 
-    @bot.message_handler(func=admin_command)
+    @bot.message_handler(func=users_command)
     async def new_chat(message):
+        action, user = get_user_action(message.text)
+
         pass
 
     @bot.message_handler(func=lambda msg: msg.text != "/new" and not msg.text.startswith("/users"))
