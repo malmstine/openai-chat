@@ -1,7 +1,7 @@
 import datetime
 
-from models import chat_table, active_chat_table, message_table
-from chat import send_messages
+from openai_chat.db.models import chat_table, active_chat_table, message_table
+from openai_chat.chat import send_messages
 
 
 async def init_new_chat(session, user_id, system_role=None):

@@ -5,8 +5,10 @@ import asyncio
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+
 from telebot.async_telebot import AsyncTeleBot
-from domains import init_new_chat, answer_bot
+from openai_chat.telebot import get_user_action
+from openai_chat.domains import init_new_chat, answer_bot
 from src.openai_chat.telebot import users_command
 
 logging.basicConfig(filename="fatum.log", format='%(asctime)s %(message)s', filemode='w')
