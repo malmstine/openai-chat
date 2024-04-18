@@ -5,7 +5,14 @@ description = "Add your description here"
 authors = [
     { name = "ivan", email = "molotkov.1997@mail.ru" }
 ]
-dependencies = []
+dependencies = [
+    "python-dotenv>=1.0.1",
+    "alembic>=1.13.1",
+    "asyncpg>=0.29.0",
+    "pytelegrambotapi>=4.17.0",
+    "openai>=1.21.2",
+    "psycopg2>=2.9.9",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 

@@ -3,20 +3,28 @@ from os import environ
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import text
 
 from alembic import context
-from models import metadata
+from openai_chat.db.models import metadata
+from dotenv import load_dotenv, dotenv_values
+
+from pathlib import Path
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
+source_dir = Path(__file__).parent.parent.resolve() / ".env"
+env_values = dotenv_values(source_dir)
+
+
 section = config.config_ini_section
-config.set_section_option(section, "DB_USER", environ.get("DB_USER", "openai-chat"))
-config.set_section_option(section, "DB_PASS", environ.get("DB_PASS", "openai-chat"))
-config.set_section_option(section, "DB_NAME", environ.get("DB_NAME", "openai-chat"))
-config.set_section_option(section, "DB_PORT", environ.get("DB_PORT", "5432"))
-config.set_section_option(section, "DB_HOST", environ.get("DB_HOST", "127.0.0.1"))
+config.set_section_option(section, "DB_USER", env_values.get("DB_USER"))
+config.set_section_option(section, "DB_PASS", env_values.get("DB_PASS"))
+config.set_section_option(section, "DB_NAME", env_values.get("DB_NAME"))
+config.set_section_option(section, "DB_PORT", str(env_values.get("DB_PORT")))
+config.set_section_option(section, "DB_HOST", env_values.get("DB_HOST"))
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
@@ -70,7 +78,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, target_metadata=target_metadata,
+            version_table_schema="openai_chat"
         )
 
         with context.begin_transaction():

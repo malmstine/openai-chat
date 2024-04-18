@@ -1,7 +1,7 @@
 import sqlalchemy
 
 
-metadata = sqlalchemy.MetaData()
+metadata = sqlalchemy.MetaData(schema="openai_chat")
 
 
 chat_table = sqlalchemy.Table(
@@ -29,4 +29,11 @@ active_chat_table = sqlalchemy.Table(
     metadata,
     sqlalchemy.Column("user_id", sqlalchemy.BigInteger, primary_key=True),
     sqlalchemy.Column("active_chat", sqlalchemy.ForeignKey("chat.id"))
+)
+
+
+users = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("telegram_user_id", sqlalchemy.BigInteger, primary_key=True, autoincrement=False),
 )
