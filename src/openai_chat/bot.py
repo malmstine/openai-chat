@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from telebot.async_telebot import AsyncTeleBot
+
+from openai_chat import domains, exceptions
 from openai_chat.telebot import get_user_action
 from openai_chat.domains import init_new_chat, answer_bot
 from src.openai_chat.telebot import users_command
@@ -60,7 +62,13 @@ try:
     @bot.message_handler(func=users_command)
     async def user_actions(message):
         action, user = get_user_action(message.text)
-        pass
+        active = action == "add"
+        user_id = message.from_user.id
+        async with async_session() as session:
+            try:
+                await domains.set_user_active(session, t_user_id=user_id, active=active)
+            except exceptions.NotFound:
+                pass
 
     @bot.message_handler(
         func=lambda msg: msg.text != "/new" and not msg.text.startswith("/users")

@@ -85,7 +85,14 @@ async def answer_bot(session, user_id, text):
 
 async def set_user_active(session, t_user_id: int, active: bool = False) -> None:
     res = await session.execute(
-        users.update(active=active).where(users.c.user_id == t_user_id)
+        users.update(active=active).where(users.c.telegram_user_id == t_user_id)
     )
-    if res.rowcount == 0:
+    if res.rowcount != 0:
+        return
+
+    if not active:
         raise NotFound
+
+    await session.execute(
+        users.insert().values(telegram_user_id=t_user_id, active=active)
+    )
