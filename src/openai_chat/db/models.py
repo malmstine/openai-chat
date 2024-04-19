@@ -19,8 +19,7 @@ message_table = sqlalchemy.Table(
     sqlalchemy.Column("content", sqlalchemy.Text),
     sqlalchemy.Column("role", sqlalchemy.Text),
     sqlalchemy.Column("created", sqlalchemy.DateTime),
-    sqlalchemy.Column("chat_id", sqlalchemy.ForeignKey("chat.id"))
-
+    sqlalchemy.Column("chat_id", sqlalchemy.ForeignKey("chat.id")),
 )
 
 
@@ -28,12 +27,14 @@ active_chat_table = sqlalchemy.Table(
     "active_chat",
     metadata,
     sqlalchemy.Column("user_id", sqlalchemy.BigInteger, primary_key=True),
-    sqlalchemy.Column("active_chat", sqlalchemy.ForeignKey("chat.id"))
+    sqlalchemy.Column("active_chat", sqlalchemy.ForeignKey("chat.id")),
 )
 
 
 users = sqlalchemy.Table(
     "users",
     metadata,
-    sqlalchemy.Column("telegram_user_id", sqlalchemy.BigInteger, primary_key=True, autoincrement=False),
+    sqlalchemy.Column(
+        "telegram_user_id", sqlalchemy.BigInteger, primary_key=True, autoincrement=False
+    ),
 )

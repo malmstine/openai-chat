@@ -1,4 +1,3 @@
-
 def users_command(msg):
     msg: str = msg.text
     if msg.startswith("/users "):

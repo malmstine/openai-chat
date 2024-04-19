@@ -11,13 +11,17 @@ from openai_chat.telebot import get_user_action
 from openai_chat.domains import init_new_chat, answer_bot
 from src.openai_chat.telebot import users_command
 
-logging.basicConfig(filename="fatum.log", format='%(asctime)s %(message)s', filemode='w')
+logging.basicConfig(
+    filename="fatum.log", format="%(asctime)s %(message)s", filemode="w"
+)
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-USER_WHITE_LIST = [int(user_id) for user_id in os.environ.get("USER_WHITE_LIST").split(":")]
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
+USER_WHITE_LIST = [
+    int(user_id) for user_id in os.environ.get("USER_WHITE_LIST").split(":")
+]
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 
 DB_USER = os.environ.get("DB_USER", "openai-chat")
@@ -31,9 +35,7 @@ engine = create_async_engine(DATABASE_URL, echo=True)
 
 
 def create_session_marker(engine_):
-    return sessionmaker(
-        engine_, class_=AsyncSession, expire_on_commit=False
-    )
+    return sessionmaker(engine_, class_=AsyncSession, expire_on_commit=False)
 
 
 async_session = create_session_marker(engine)
@@ -42,7 +44,7 @@ async_session = create_session_marker(engine)
 try:
     bot = AsyncTeleBot(BOT_TOKEN)
 
-    @bot.message_handler(commands=['new'])
+    @bot.message_handler(commands=["new"])
     async def new_chat(message):
         user_id = message.from_user.id
         async with async_session() as session:
@@ -55,24 +57,23 @@ try:
             await session.commit()
             await bot.send_message(message.chat.id, "✨")
 
-
     @bot.message_handler(func=users_command)
     async def new_chat(message):
         action, user = get_user_action(message.text)
-
         pass
 
-    @bot.message_handler(func=lambda msg: msg.text != "/new" and not msg.text.startswith("/users"))
+    @bot.message_handler(
+        func=lambda msg: msg.text != "/new" and not msg.text.startswith("/users")
+    )
     async def send_welcome(message):
         if message.from_user.id not in USER_WHITE_LIST:
             return
 
-        await bot.send_chat_action(message.from_user.id, 'typing')
+        await bot.send_chat_action(message.from_user.id, "typing")
         async with async_session() as session:
             answer = await answer_bot(session, message.from_user.id, message.text)
             await bot.send_message(message.chat.id, answer)
             return answer
-
 
     asyncio.run(bot.polling())
 except BaseException as ex:
