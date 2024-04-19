@@ -1,7 +1,8 @@
 import datetime
 
-from openai_chat.db.models import chat_table, active_chat_table, message_table
+from openai_chat.db.models import chat_table, active_chat_table, message_table, users
 from openai_chat.chat import send_messages
+from openai_chat.exceptions import NotFound
 
 
 async def init_new_chat(session, user_id, system_role=None):
@@ -80,3 +81,11 @@ async def answer_bot(session, user_id, text):
     new_mess = send_messages(messages)
     await session.commit()
     return new_mess
+
+
+async def set_user_active(session, t_user_id: int, active: bool = False) -> None:
+    res = await session.execute(
+        users.update(active=active).where(users.c.user_id == t_user_id)
+    )
+    if res.rowcount == 0:
+        raise NotFound

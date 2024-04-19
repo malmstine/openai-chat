@@ -37,4 +37,5 @@ users = sqlalchemy.Table(
     sqlalchemy.Column(
         "telegram_user_id", sqlalchemy.BigInteger, primary_key=True, autoincrement=False
     ),
+    sqlalchemy.Column("active", sqlalchemy.Boolean),
 )

@@ -58,7 +58,7 @@ try:
             await bot.send_message(message.chat.id, "✨")
 
     @bot.message_handler(func=users_command)
-    async def new_chat(message):
+    async def user_actions(message):
         action, user = get_user_action(message.text)
         pass
 
