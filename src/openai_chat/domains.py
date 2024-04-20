@@ -1,4 +1,5 @@
 import datetime
+import sqlalchemy as sa
 
 from openai_chat.db.models import chat_table, active_chat_table, message_table, users
 from openai_chat.chat import send_messages
@@ -57,7 +58,7 @@ async def get_chat_messages(session, chat_id):
     return res, system_role
 
 
-async def answer_bot(session, user_id, text):
+async def answer_bot(session, user_id, text, message_sender=send_messages):
     ex = await session.execute(
         active_chat_table.select()
         .with_only_columns(active_chat_table.c.active_chat)
@@ -78,14 +79,14 @@ async def answer_bot(session, user_id, text):
                 content=system_role,
             ),
         )
-    new_mess = send_messages(messages)
+    new_mess = message_sender(messages)
     await session.commit()
     return new_mess
 
 
 async def set_user_active(session, t_user_id: int, active: bool = False) -> None:
     res = await session.execute(
-        users.update(active=active).where(users.c.telegram_user_id == t_user_id)
+        users.update().values(active=active).where(users.c.telegram_user_id == t_user_id)
     )
     if res.rowcount != 0:
         return
@@ -96,3 +97,19 @@ async def set_user_active(session, t_user_id: int, active: bool = False) -> None
     await session.execute(
         users.insert().values(telegram_user_id=t_user_id, active=active)
     )
+
+
+async def get_active_user_ids(session) -> list[int]:
+    res = await session.execute(
+        sa.select(users.c.telegram_user_id).where(users.c.active)
+    )
+    return res.scalars()
+
+
+async def get_user_status(session) -> list[str]:
+    res = await session.execute(
+        users.select()
+    )
+    return [
+        f"user_id={row.telegram_user_id}, active={row.active}" for row in res
+    ]

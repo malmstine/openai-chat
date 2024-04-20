@@ -1,5 +1,4 @@
-# USER_WHITE_LIST=1137456967:493865338
-from openai_chat.telebot import get_user_action
+from openai_chat.actions import get_user_action
 
 
 def test__get_user_action():
