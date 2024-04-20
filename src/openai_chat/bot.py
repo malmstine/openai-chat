@@ -69,6 +69,8 @@ def main():
                 await init_new_chat(session, user_id, system_role=system_role)
                 await session.commit()
                 await bot.send_message(message.chat.id, "✨")
+                if system_role:
+                    await bot.send_message(message.chat.id, f"Роль: \"{system_role}\" установлена")
 
         @bot.message_handler(func=users_command)
         async def user_actions(message):
