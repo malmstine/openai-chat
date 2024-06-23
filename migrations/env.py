@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+import sqlalchemy
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -36,6 +37,16 @@ target_metadata = [metadata]
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+AUTOGENERATE_SCHEMAS = ["openai_chat"]
+
+
+def include_name(name, type_, parent_names):
+    """Функция, которая позволяет явно указать схему для генерации миграций"""
+    if type_ == "schema":
+        return name in AUTOGENERATE_SCHEMAS
+    else:
+        return True
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -56,6 +67,9 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
         version_table_schema="openai_chat",
+        compare_type=True,
+        include_schemas=True,
+        include_name=include_name,
     )
 
     with context.begin_transaction():
@@ -76,10 +90,14 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        connection.execute(sqlalchemy.text("CREATE SCHEMA IF NOT EXISTS openai_chat"))
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
             version_table_schema="openai_chat",
+            compare_type=True,
+            include_schemas=True,
+            include_name=include_name,
         )
 
         with context.begin_transaction():

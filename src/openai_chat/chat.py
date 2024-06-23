@@ -1,11 +1,11 @@
-import os
-
-import openai
-
-token = os.environ.get("OPENAI_KEY")
-openai.api_key = token
+from openai import AsyncOpenAI
+from openai_chat.settings import settings
 
 
-def send_messages(messages):
-    res = openai.ChatCompletion.create(model="gpt-4-1106-preview", messages=messages)
-    return res["choices"][0]["message"]["content"]
+client = AsyncOpenAI(
+    api_key=settings.OPENAI_KEY
+)
+
+
+async def send_messages(messages, model):
+    return await client.chat.completions.create(model=model, messages=messages)

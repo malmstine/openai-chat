@@ -1,2 +1,2 @@
 alembic upgrade head
-python bot.py
+python app.py

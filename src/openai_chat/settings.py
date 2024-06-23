@@ -12,9 +12,9 @@ class Settings:
     DB_PORT = os.environ.get("DB_PORT")
     DB_HOST = os.environ.get("DB_HOST")
     DB_NAME = os.environ.get("DB_NAME")
-    USER_ADMINS = [
-        int(user_id) for user_id in os.environ.get("USER_WHITE_LIST").split(":")
-    ]
+    OPENAI_KEY = os.environ.get("OPENAI_KEY")
+    DEFAULT_MODEL = os.environ.get("DEFAULT_MODEL")
+    USER_ADMINS = [int(user_id) for user_id in os.environ.get("USER_ADMINS").split(":")]
 
 
 settings = Settings()
