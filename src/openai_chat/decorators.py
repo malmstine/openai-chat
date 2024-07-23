@@ -4,6 +4,10 @@ import functools
 from openai_chat.db.connect import async_session
 from openai_chat._domains import get_active_user_ids, get_usage, usage_limits
 from openai_chat.settings import settings
+import logging
+from sentry_sdk import capture_exception
+
+logger = logging.getLogger(__name__)
 
 
 async def _send_typing(bot, user_id):
@@ -54,6 +58,11 @@ def with_session(func):
     @functools.wraps(func)
     async def decorator(message):
         async with async_session() as session:
-            return await func(message, session)
+            try:
+                return await func(message, session)
+            except BaseException as e:
+                logger.error(str(e), exc_info=e)
+                capture_exception(e)
+                pass
 
     return decorator

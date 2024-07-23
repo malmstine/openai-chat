@@ -57,7 +57,7 @@ async def get_current_discussion(session, user_id: int):
 
 async def get_discussion_messages(session, discussion_id):
     res = await session.execute(
-        models.message.select().where(models.message.c.discussion == discussion_id)
+        models.message.select().where(models.message.c.discussion == discussion_id).order_by(models.message.c.id)
     )
     return list(res)
 

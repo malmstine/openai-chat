@@ -9,6 +9,14 @@ from openai_chat.settings import settings
 from openai_chat import _domains as domains
 from telebot import types
 
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://8fa4fa7c691cf32d4ef91c488903929d@o4507550429741056.ingest.us.sentry.io/4507550434525184",
+    traces_sample_rate=1.0,
+    profiles_sample_rate=1.0,
+)
+
 
 def get_system_role(message):
     if "\n" not in message.text:
